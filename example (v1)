@@ -1,0 +1,44 @@
+// Create window
+const myWindow = createWindow("Example UI");
+
+// Create tabs
+const mainTab = createTab(myWindow, "Main");
+const settingsTab = createTab(myWindow, "Settings");
+
+// Add a button using .AddButton()
+mainTab.AddButton({
+  Name: "Say Hello",
+  Callback: function () {
+    alert("Hello from Main Tab!");
+  }
+});
+
+mainTab.AddButton({
+  Name: "Log to Console",
+  Callback: function () {
+    console.log("Button in Main Tab was pressed.");
+  }
+});
+
+// an empty line
+createLine(mainTab);
+
+// Add a slider
+createSlider(mainTab, "Volume", 0, 100, function (value) {
+  console.log("Volume changed to:", value);
+});
+
+settingsTab.AddButton({
+  Name: "Reset Settings",
+  Callback: function () {
+    alert("Settings reset!");
+  }
+});
+
+// Add a line
+createLine(settingsTab);
+
+// Add another slider
+createSlider(settingsTab, "Brightness", 0, 100, function (value) {
+  console.log("Brightness is now:", value);
+});
