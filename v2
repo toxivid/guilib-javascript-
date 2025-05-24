@@ -4,7 +4,12 @@
   function makeDraggable(el) {
     let isDown = false, offset = [0, 0];
     el.addEventListener('mousedown', function (e) {
-      if (e.target.className === "nodrag") return;
+      const tag = e.target.tagName.toLowerCase();
+      if (
+        e.target.className === "nodrag" ||
+        tag === "input" || tag === "textarea" || tag === "select"
+      ) return;
+
       isDown = true;
       offset = [el.offsetLeft - e.clientX, el.offsetTop - e.clientY];
       el.style.cursor = 'grabbing';
