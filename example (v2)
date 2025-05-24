@@ -1,0 +1,150 @@
+const gui = createWindow("Super GUI Demo");
+const mainTab = createTab(gui, "Main");
+const settingsTab = createTab(gui, "Settings");
+const audioTab = createTab(gui, "Audio");
+const debugTab = createTab(gui, "Debug");
+
+// ──────────────── MAIN TAB ────────────────
+mainTab.AddButton({
+  Name: "Launch Rocket",
+  Callback: () => console.log("🚀 Rocket Launched!")
+});
+
+mainTab.AddSlider({
+  Name: "Rocket Speed",
+  Min: 0,
+  Max: 100,
+  Callback: (val) => console.log("Rocket speed:", val)
+});
+
+mainTab.AddCheckbox({
+  Name: "Auto Launch",
+  Default: false,
+  Callback: (val) => console.log("Auto Launch:", val)
+});
+
+mainTab.AddLine();
+
+mainTab.AddButton({
+  Name: "Self-Destruct",
+  Callback: () => alert("💥 Boom!")
+});
+
+mainTab.AddCheckbox({
+  Name: "Enable Safety Mode",
+  Default: true,
+  Callback: (val) => console.log("Safety mode:", val)
+});
+
+mainTab.AddSlider({
+  Name: "Countdown Timer",
+  Min: 5,
+  Max: 60,
+  Callback: (val) => console.log("Countdown:", val + "s")
+});
+
+// ──────────────── SETTINGS TAB ────────────────
+settingsTab.AddSlider({
+  Name: "Brightness",
+  Min: 0,
+  Max: 100,
+  Callback: (val) => console.log("Brightness:", val)
+});
+
+settingsTab.AddSlider({
+  Name: "Contrast",
+  Min: 0,
+  Max: 100,
+  Callback: (val) => console.log("Contrast:", val)
+});
+
+settingsTab.AddSlider({
+  Name: "Saturation",
+  Min: 0,
+  Max: 100,
+  Callback: (val) => console.log("Saturation:", val)
+});
+
+settingsTab.AddLine();
+
+settingsTab.AddCheckbox({
+  Name: "Enable Night Mode",
+  Default: false,
+  Callback: (val) => console.log("Night mode:", val)
+});
+
+settingsTab.AddCheckbox({
+  Name: "Reduce Motion",
+  Default: true,
+  Callback: (val) => console.log("Reduce motion:", val)
+});
+
+settingsTab.AddButton({
+  Name: "Reset Settings",
+  Callback: () => console.log("Settings reset to default.")
+});
+
+// ──────────────── AUDIO TAB ────────────────
+audioTab.AddSlider({
+  Name: "Master Volume",
+  Min: 0,
+  Max: 100,
+  Callback: (val) => console.log("Volume:", val)
+});
+
+audioTab.AddSlider({
+  Name: "Music Volume",
+  Min: 0,
+  Max: 100,
+  Callback: (val) => console.log("Music:", val)
+});
+
+audioTab.AddSlider({
+  Name: "SFX Volume",
+  Min: 0,
+  Max: 100,
+  Callback: (val) => console.log("SFX:", val)
+});
+
+audioTab.AddCheckbox({
+  Name: "Mute All",
+  Default: false,
+  Callback: (val) => console.log("Mute All:", val)
+});
+
+audioTab.AddCheckbox({
+  Name: "Spatial Audio",
+  Default: true,
+  Callback: (val) => console.log("Spatial Audio:", val)
+});
+
+// ──────────────── DEBUG TAB ────────────────
+debugTab.AddButton({
+  Name: "Log Test",
+  Callback: () => console.log("Log Test Button Pressed")
+});
+
+debugTab.AddButton({
+  Name: "Show Coordinates",
+  Callback: () => console.log("Mouse X,Y: ", window.mouseX, window.mouseY)
+});
+
+debugTab.AddCheckbox({
+  Name: "Show Debug Info",
+  Default: true,
+  Callback: (val) => console.log("Debug info shown:", val)
+});
+
+debugTab.AddLine();
+
+debugTab.AddSlider({
+  Name: "Simulation Speed",
+  Min: 1,
+  Max: 10,
+  Callback: (val) => console.log("Simulation speed:", val)
+});
+
+debugTab.AddButton({
+  Name: "Force Crash 💀",
+  Callback: () => { throw new Error("Manual crash triggered"); }
+});
