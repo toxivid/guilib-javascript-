@@ -1,0 +1,16 @@
+const gui = createWindow("cookiecliker cheat");
+
+maintab.AddButton({
+  Name: "infinite cookies",
+  Callback: () => Game.cookies
+});
+
+maintab.AddButton({
+  Name: "play sound",
+  Callback: () => Game.playCookieClickSound
+});
+
+maintab.AddButton({
+  Name: "infinite cookies",
+  Callback: () => Game.cookies = 9999999999999999999999999
+});
