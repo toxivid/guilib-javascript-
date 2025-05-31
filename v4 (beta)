@@ -2,23 +2,30 @@
   if (window.createWindow) return;
 
   function makeDraggable(e) {
-    let t = !1, n = [0, 0];
+    let t = false, n = [0, 0];
     e.addEventListener("mousedown", function (o) {
       const r = o.target.tagName.toLowerCase();
       if ("nodrag" === o.target.className || ["input", "textarea", "select"].includes(r)) return;
-      t = !0, n = [e.offsetLeft - o.clientX, e.offsetTop - o.clientY], e.style.cursor = "grabbing"
+      t = true;
+      n = [e.offsetLeft - o.clientX, e.offsetTop - o.clientY];
+      e.style.cursor = "grabbing";
     });
     document.addEventListener("mouseup", () => {
-      t = !1, e.style.cursor = "default"
+      t = false;
+      e.style.cursor = "default";
     });
     document.addEventListener("mousemove", function (o) {
-      t && (o.preventDefault(), e.style.left = o.clientX + n[0] + "px", e.style.top = o.clientY + n[1] + "px")
+      if (t) {
+        o.preventDefault();
+        e.style.left = o.clientX + n[0] + "px";
+        e.style.top = o.clientY + n[1] + "px";
+      }
     });
   }
 
-  window.createWindow = function (e, t = !0) {
-    const n = document.createElement("div");
-    Object.assign(n.style, {
+  window.createWindow = function (titleText, draggable = true) {
+    const win = document.createElement("div");
+    Object.assign(win.style, {
       position: "fixed",
       top: "50%",
       left: "50%",
@@ -35,12 +42,11 @@
       overflow: "hidden"
     });
 
-    const o = document.createElement("div");
-    o.textContent = e;
-    o.className = "nodrag";
-    Object.assign(o.style, {
+    const title = document.createElement("div");
+    title.textContent = titleText;
+    title.className = "nodrag";
+    Object.assign(title.style, {
       background: "#111",
-      color: "white",
       fontSize: "18px",
       fontWeight: "bold",
       padding: "10px",
@@ -48,10 +54,10 @@
       borderBottom: "1px solid #333"
     });
 
-    const r = document.createElement("div");
-    r.textContent = "×";
-    r.className = "nodrag";
-    Object.assign(r.style, {
+    const close = document.createElement("div");
+    close.textContent = "×";
+    close.className = "nodrag";
+    Object.assign(close.style, {
       position: "absolute",
       top: "10px",
       right: "15px",
@@ -60,32 +66,35 @@
       fontSize: "20px",
       fontWeight: "bold"
     });
-    r.onmouseover = () => r.style.color = "red";
-    r.onmouseout = () => r.style.color = "#aaa";
-    r.onclick = () => n.remove();
+    close.onmouseover = () => close.style.color = "red";
+    close.onmouseout = () => close.style.color = "#aaa";
+    close.onclick = () => win.remove();
 
-    const i = document.createElement("div");
-    Object.assign(i.style, {
+    const tabBar = document.createElement("div");
+    Object.assign(tabBar.style, {
       display: "flex",
       borderBottom: "1px solid #444",
       background: "#222"
     });
 
-    const a = document.createElement("div");
-    Object.assign(a.style, { padding: "15px" });
+    const contentWrapper = document.createElement("div");
+    Object.assign(contentWrapper.style, {
+      padding: "15px"
+    });
 
-    n.appendChild(o);
-    n.appendChild(r);
-    n.appendChild(i);
-    n.appendChild(a);
-    document.body.appendChild(n);
-    t && makeDraggable(n);
+    win.appendChild(title);
+    win.appendChild(close);
+    win.appendChild(tabBar);
+    win.appendChild(contentWrapper);
+    document.body.appendChild(win);
+    if (draggable) makeDraggable(win);
 
-    const l = [];
-    n.createtab = function (e) {
-      const t = document.createElement("div");
-      t.textContent = e;
-      Object.assign(t.style, {
+    const tabs = [];
+
+    win.createTab = function (name) {
+      const tabButton = document.createElement("div");
+      tabButton.textContent = name;
+      Object.assign(tabButton.style, {
         padding: "10px",
         cursor: "pointer",
         background: "#222",
@@ -94,47 +103,103 @@
         textAlign: "center"
       });
 
-      const n = document.createElement("div");
-      n.style.display = "none";
-      a.appendChild(n);
+      const tabContent = document.createElement("div");
+      tabContent.style.display = "none";
+      contentWrapper.appendChild(tabContent);
 
-      t.onclick = () => {
-        l.forEach(e => {
-          e.button.style.background = "#222";
-          e.content.style.display = "none"
+      tabButton.onclick = () => {
+        tabs.forEach(tab => {
+          tab.button.style.background = "#222";
+          tab.content.style.display = "none";
         });
-        t.style.background = "#333";
-        n.style.display = "block"
+        tabButton.style.background = "#333";
+        tabContent.style.display = "block";
       };
 
-      i.appendChild(t);
-      l.push({ button: t, content: n });
-      if (l.length === 1) t.click();
-      return n;
+      tabBar.appendChild(tabButton);
+      tabs.push({ button: tabButton, content: tabContent });
+
+      if (tabs.length === 1) tabButton.click();
+
+      return tabContent;
     };
 
-    return n;
+    return win;
   };
 
-  HTMLElement.prototype.AddCheckbox = function (e) {
-    const t = document.createElement("label"),
-      n = document.createElement("input");
-    n.type = "checkbox";
-    n.checked = !!e.Default;
-    n.onchange = () => { e.Callback && e.Callback(n.checked) };
-    t.style.display = "block";
-    t.style.marginTop = "10px";
-    n.style.marginRight = "8px";
-    t.appendChild(n);
-    t.appendChild(document.createTextNode(e.Name));
-    this.appendChild(t);
-    return n;
+  // GUI element helpers
+  HTMLElement.prototype.AddLabel = function (text, size = "14px") {
+    const label = document.createElement("div");
+    label.textContent = text;
+    label.style.fontSize = size;
+    label.style.margin = "6px 0";
+    this.appendChild(label);
+    return label;
   };
 
-  HTMLElement.prototype.AddButton = function (e) {
-    const t = document.createElement("button");
-    t.textContent = e.Name;
-    Object.assign(t.style, {
+  HTMLElement.prototype.AddInput = function (options) {
+    const label = document.createElement("label");
+    label.textContent = options.Name + ":";
+    label.style.display = "block";
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.placeholder = options.placeholder || "";
+    Object.assign(input.style, {
+      width: "100%",
+      marginTop: "4px",
+      padding: "4px",
+      borderRadius: "4px",
+      border: "none"
+    });
+
+    function confirmValue() {
+      if (options.Callback) options.Callback(input.value);
+    }
+
+    if (options.ConfirmButton) {
+      const button = document.createElement("button");
+      button.textContent = "OK";
+      button.style.marginTop = "4px";
+      button.style.width = "100%";
+      button.onclick = confirmValue;
+      label.appendChild(input);
+      label.appendChild(button);
+    } else {
+      input.addEventListener("keydown", ev => {
+        if (ev.key === "Enter") confirmValue();
+      });
+      input.addEventListener("blur", confirmValue);
+      label.appendChild(input);
+    }
+
+    this.appendChild(label);
+    return input;
+  };
+
+  HTMLElement.prototype.AddCheckbox = function (options) {
+    const label = document.createElement("label");
+    label.style.display = "block";
+    label.style.marginTop = "10px";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = !!options.Default;
+    checkbox.style.marginRight = "8px";
+    checkbox.onchange = () => {
+      if (options.Callback) options.Callback(checkbox.checked);
+    };
+
+    label.appendChild(checkbox);
+    label.appendChild(document.createTextNode(options.Name));
+    this.appendChild(label);
+    return checkbox;
+  };
+
+  HTMLElement.prototype.AddButton = function (options) {
+    const button = document.createElement("button");
+    button.textContent = options.Name;
+    Object.assign(button.style, {
       display: "block",
       marginTop: "6px",
       padding: "6px 12px",
@@ -146,95 +211,53 @@
       textAlign: "left",
       borderRadius: "4px"
     });
-    t.onclick = e.Callback;
-    this.appendChild(t);
-    return t;
+    button.onclick = options.Callback;
+    this.appendChild(button);
+    return button;
   };
 
-  HTMLElement.prototype.AddSlider = function (e) {
-    const t = document.createElement("label");
-    t.textContent = e.Name + ": ";
-    t.style.display = "block";
-    const n = document.createElement("span");
-    n.textContent = e.Min;
-    t.appendChild(n);
-    const o = document.createElement("input");
-    o.type = "range";
-    o.min = e.Min;
-    o.max = e.Max;
-    o.value = e.Min;
-    o.style.width = "100%";
-    o.oninput = () => {
-      n.textContent = o.value;
-      if (!e.ConfirmButton && e.Callback) e.Callback(Number(o.value))
-    };
-    this.appendChild(t);
-    this.appendChild(o);
-    if (e.ConfirmButton) {
-      const b = document.createElement("button");
-      b.textContent = "OK";
-      b.style.marginTop = "4px";
-      b.style.width = "100%";
-      b.onclick = () => e.Callback && e.Callback(Number(o.value));
-      this.appendChild(b)
-    }
-    return o;
-  };
-
-  HTMLElement.prototype.AddInput = function (e) {
+  HTMLElement.prototype.AddSlider = function (options) {
     const label = document.createElement("label");
-    label.textContent = e.Name + ":";
+    label.textContent = options.Name + ": ";
     label.style.display = "block";
-    const input = document.createElement("input");
-    input.type = "text";
-    input.placeholder = e.placeholder || "";
-    input.style.width = "100%";
-    input.style.marginTop = "4px";
-    input.style.padding = "4px";
-    input.style.borderRadius = "4px";
-    input.style.border = "none";
-    const confirmWithButton = e.ConfirmButton === true;
 
-    function confirmValue() {
-      if (e.Callback) e.Callback(input.value);
-    }
+    const valueSpan = document.createElement("span");
+    valueSpan.textContent = options.Min;
+    label.appendChild(valueSpan);
 
-    if (confirmWithButton) {
+    const slider = document.createElement("input");
+    slider.type = "range";
+    slider.min = options.Min;
+    slider.max = options.Max;
+    slider.value = options.Min;
+    slider.style.width = "100%";
+
+    slider.oninput = () => {
+      valueSpan.textContent = slider.value;
+      if (!options.ConfirmButton && options.Callback) {
+        options.Callback(Number(slider.value));
+      }
+    };
+
+    this.appendChild(label);
+    this.appendChild(slider);
+
+    if (options.ConfirmButton) {
       const button = document.createElement("button");
       button.textContent = "OK";
       button.style.marginTop = "4px";
       button.style.width = "100%";
-      button.onclick = confirmValue;
-      label.appendChild(input);
-      label.appendChild(button);
-    } else {
-      input.addEventListener("keydown", function (ev) {
-        if (ev.key === "Enter") confirmValue();
-      });
-      input.addEventListener("blur", confirmValue);
-      label.appendChild(input);
+      button.onclick = () => options.Callback && options.Callback(Number(slider.value));
+      this.appendChild(button);
     }
 
-    this.appendChild(label);
-    return input;
+    return slider;
   };
 
   HTMLElement.prototype.AddLine = function () {
-    const e = document.createElement("div");
-    e.style.height = "20px";
-    this.appendChild(e);
-    return e;
+    const spacer = document.createElement("div");
+    spacer.style.height = "20px";
+    this.appendChild(spacer);
+    return spacer;
   };
-
-  // NEW: AddLabel function
-  HTMLElement.prototype.AddLabel = function (text) {
-    const label = document.createElement("div");
-    label.textContent = text;
-    label.style.marginTop = "10px";
-    label.style.color = "white";
-    label.style.fontWeight = "bold";
-    this.appendChild(label);
-    return label;
-  };
-
 })();
