@@ -1,0 +1,111 @@
+const win = createWindow("My GUI Window");
+
+const maintab = win.createTab("Main");
+const valuestab = win.createTab("Values");
+const farmingtab = win.createTab("Farming");
+const premiumtab = win.createTab("Premium");
+const extratab = win.createTab("Extra");
+
+let cookieAutoInterval = null;
+let cookiesPerSecond = 0;
+
+maintab.AddButton({
+  Name: "hard reset game (lose all)",
+  Callback: () => {
+      localStorage.clear();
+      location.reload();
+  }
+});
+
+valuestab.AddButton({
+  Name: "get infinite cookies",
+  Callback: () => {
+      Game.cookies = 1e+1000;
+  }
+});
+
+valuestab.AddButton({
+  Name: "set cookies to 0",
+  Callback: () => {
+      Game.cookies = 0;
+  }
+});
+
+valuestab.AddInput({
+  Name: "add cookies",
+  placeholder: "enter cookies",
+  ConfirmButton: true,
+  Callback: val => Game.cookies = parseFloat(val)
+});
+
+valuestab.AddSlider({
+  Name: "add cookies (low)",
+  Min: 0,
+  Max: 100000,
+  ConfirmButton: false,
+  Callback: val => {
+      Game.cookies += val;
+      console.log("Added low cookies:", val);
+  }
+});
+
+valuestab.AddSlider({
+  Name: "add cookies (high)",
+  Min: 0,
+  Max: 1e+10, // veiliger dan 1e+100
+  ConfirmButton: false,
+  Callback: val => {
+      Game.cookies += val;
+      console.log("Added high cookies:", val);
+  }
+});
+
+farmingtab.AddSlider({
+  Name: "cookiesps",
+  Min: 0,
+  Max: 100,
+  ConfirmButton: false,
+  Callback: val => {
+      cookiesPerSecond = val;
+      console.log("Auto add rate set to:", val);
+  }
+});
+
+farmingtab.AddCheckbox({
+  Name: "Auto Add Cookies (method 1)",
+  Default: false,
+  Callback: checked => {
+      if (checked) {
+          cookieAutoInterval = setInterval(() => {
+              Game.cookies += cookiesPerSecond;
+          }, 1000);
+      } else {
+          clearInterval(cookieAutoInterval);
+      }
+  }
+});
+
+farmingtab.AddCheckbox({
+  Name: "Auto Add Cookies (method 2)",
+  Default: false,
+  Callback: checked => {
+      if (checked) {
+          cookieAutoInterval = setInterval(() => {
+              Game.cookiesPs = cookiesPerSecond;
+          }, 1000);
+      } else {
+          clearInterval(cookieAutoInterval);
+      }
+  }
+});
+
+premiumtab.AddButton({
+  Name: "unlock all (OP)",
+  Callback: () => {
+      Game.RuinTheFun()
+  }
+});
+
+extratab.AddLabel("suggestions or questions?", "30px");
+extratab.AddLabel("github: toxivid", "20px");
+extratab.AddLabel("discord: toxivid", "20px");
